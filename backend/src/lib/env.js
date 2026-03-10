@@ -11,5 +11,6 @@ export const ENV = {
     STREAM_API_SECRET: process.env.STREAM_API_SECRET,
     CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    FRONTEND_URL: process.env.FRONTEND_URL,
     
 }
