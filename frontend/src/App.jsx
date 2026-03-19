@@ -8,13 +8,20 @@ import { Toaster } from 'react-hot-toast';
 
 function App() {
 
-  const {isSignedIn} = useUser()
+  const {isSignedIn,isLoaded} = useUser()
 
   return (
     <>
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/problems" element={isSignedIn ? <ProblemPage /> : <Navigate to={"/"} />} />
+            <Route 
+                path="/problems" 
+                element={
+                  !isLoaded ? null  // ⏳ still loading — render nothing (or a spinner)
+                  : isSignedIn ? <ProblemPage /> 
+                  : <Navigate to="/" />
+                } 
+            />
     </Routes>
 
     <Toaster position='top-right' toastOptions={{duration:1500}}/>
