@@ -8,6 +8,7 @@ import { inngest, functions } from "./lib/inngest.js";
 import { clerkMiddleware } from "@clerk/express";
 import { protectedRoute } from "./middleware/protectedRoute.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
 
 
 const app = express();
@@ -27,15 +28,7 @@ app.use("/api/inngest", serve({client: inngest, functions}));
 
 //routes
 app.use('/api/chat',chatRoutes);
-app.get('/do', (req, res) => {
-    res.status(200).json({message: "i have to do it"})
-})
-app.get('/books', (req, res) => {
-    res.status(200).json({message: "you want a book"})
-})
-app.get('/videoCall',protectedRoute, (req, res) => {
-    res.status(200).json({message: "you want a book"})
-})
+app.use("/api/session", sessionRoutes);
 
 //its for deployment in production
 if(ENV.NODE_ENV === "production"){
