@@ -12,5 +12,5 @@ export const ENV = {
     CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     FRONTEND_URL: process.env.FRONTEND_URL,
-    
+    ONLINE_COMPILER_API_KEY: process.env.ONLINE_COMPILER_API_KEY
 }
