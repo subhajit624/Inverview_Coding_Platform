@@ -32,13 +32,13 @@ const LANG_MAP = {
 };
 
 // ← DEBUG: open http://localhost:PORT/api/compilers in browser to see exact compiler strings
-app.get("/api/compilers", async (req, res) => {
-  const response = await fetch("https://api.onlinecompiler.io/api/compilers/", {
-    headers: { "Authorization": ENV.ONLINE_COMPILER_API_KEY }
-  });
-  const data = await response.json();
-  res.json(data);
-});
+// app.get("/api/compilers", async (req, res) => { // this part is not needed, its to check available compilers and their ids
+//   const response = await fetch("https://api.onlinecompiler.io/api/compilers/", {
+//     headers: { "Authorization": ENV.ONLINE_COMPILER_API_KEY }
+//   });
+//   const data = await response.json();
+//   res.json(data);
+// });
 
 app.post("/api/execute", async (req, res) => {
   const { code, language, stdin } = req.body;
