@@ -25,7 +25,7 @@ const SessionSchema = new mongoose.Schema({
         enum: ['active', 'completed'],
         default: 'active',
     },
-    //stream video call id
+    //video call id which need to join for video call
     callId : {
         type: String,
         default: '',
