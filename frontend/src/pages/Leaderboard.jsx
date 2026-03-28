@@ -333,10 +333,6 @@ export default function Leaderboard() {
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] sm:text-xs truncate mt-0.5"
-                        style={{ color: "rgba(255,255,255,0.22)" }}>
-                        {entry.email}
-                      </p>
                     </div>
                   </div>
 
