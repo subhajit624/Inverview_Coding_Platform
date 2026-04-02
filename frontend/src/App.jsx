@@ -9,6 +9,8 @@ import Problem from './pages/Problem';
 import Leaderboard from './pages/Leaderboard';
 import InterviewDashboard from './pages/InterviewDashboard';
 import Interview from './pages/Interview';
+import ResumeUpload from './pages/ResumeUpload';
+import ResumeHistory from './pages/ResumeHistory';
 
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/interview-dashboard" element={isSignedIn ? <InterviewDashboard /> : <Navigate to="/" />} />
         <Route path="/interview/:id" element={isSignedIn ? <Interview /> : <Navigate to="/" />} />
+        <Route path="/resume-upload" element={isSignedIn ? <ResumeUpload /> : <Navigate to="/" />} />
+        <Route path="/resume-history" element={isSignedIn ? <ResumeHistory /> : <Navigate to="/" />} />
       </Routes>
 
       <Toaster position='top-right' toastOptions={{ duration: 1500 }} />

@@ -14,11 +14,14 @@
   "dependencies": {
     "@clerk/express": "^1.7.41",
     "@stream-io/node-sdk": "^0.7.12",
+    "axios": "^1.13.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "form-data": "^4.0.4",
     "inngest": "^3.44.3",
     "mongoose": "^8.19.1",
+    "multer": "^2.0.2",
     "stream-chat": "^9.24.0",
     "video_calling": "file:.."
   }

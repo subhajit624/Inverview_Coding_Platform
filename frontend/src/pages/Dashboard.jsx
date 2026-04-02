@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Code2, ArrowRight, BookOpen, Video, Zap, Trophy, Users } from "lucide-react";
+import { Code2, ArrowRight, BookOpen, Video, Zap, Trophy, Users, FileSearch } from "lucide-react";
 import { UserButton, useUser } from "@clerk/react";
 import { useEffect, useState } from "react";
 import axiosInstance from "../lib/axios";
@@ -312,6 +312,21 @@ const Dashboard = () => {
               cta="Start Session"
               ctaColor="#4ade80"
               badge="Live"
+              delay={5}
+            />
+
+            {/* Resume Analyzer */}
+            <FeatureCard
+              to="/resume-upload"
+              icon={FileSearch}
+              iconColor="#c084fc"
+              iconBg="rgba(168,85,247,0.1)"
+              borderColor="#a855f7"
+              title="Resume Analyzer"
+              desc="Upload your resume and get an ATS score, keyword match report, and section-by-section AI feedback tailored to your target role."
+              cta="Analyze Resume"
+              ctaColor="#c084fc"
+              badge="AI Powered"
               delay={5}
             />
 

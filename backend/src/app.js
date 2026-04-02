@@ -10,6 +10,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 import codeExecuteRoutes from "./routes/codeExecuteRoutes.js";
 import problemRoutes from "./routes/problemRoutes.js";
+import resumeRoutes from "./routes/resumeRoutes.js";
 
 const app = express();
 const __dirname = path.resolve();
@@ -42,6 +43,7 @@ app.use("/api", codeExecuteRoutes); // all code execution requests will go to th
 app.use('/api/chat', chatRoutes);
 app.use("/api/session", sessionRoutes);
 app.use("/api/problems", problemRoutes);
+app.use("/api/resume", resumeRoutes);
 
 // production
 if (ENV.NODE_ENV === "production") {
