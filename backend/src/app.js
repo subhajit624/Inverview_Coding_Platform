@@ -11,6 +11,7 @@ import sessionRoutes from "./routes/sessionRoutes.js";
 import codeExecuteRoutes from "./routes/codeExecuteRoutes.js";
 import problemRoutes from "./routes/problemRoutes.js";
 import resumeRoutes from "./routes/resumeRoutes.js";
+import aiInterviewRoutes from "./routes/aiInterviewRoutes.js";
 
 const app = express();
 const __dirname = path.resolve();
@@ -44,6 +45,7 @@ app.use('/api/chat', chatRoutes);
 app.use("/api/session", sessionRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/resume", resumeRoutes);
+app.use("/api/ai-interview", aiInterviewRoutes);
 
 // production
 if (ENV.NODE_ENV === "production") {
