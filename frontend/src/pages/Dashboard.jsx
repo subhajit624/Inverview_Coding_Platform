@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Code2, ArrowRight, BookOpen, Video, Zap, Trophy, Users, FileSearch } from "lucide-react";
+import { Code2, ArrowRight, BookOpen, Video, Zap, Trophy, Users, FileSearch, Bot } from "lucide-react";
 import { UserButton, useUser } from "@clerk/react";
 import { useEffect, useState } from "react";
 import axiosInstance from "../lib/axios";
@@ -326,6 +326,21 @@ const Dashboard = () => {
               desc="Upload your resume and get an ATS score, keyword match report, and section-by-section AI feedback tailored to your target role."
               cta="Analyze Resume"
               ctaColor="#c084fc"
+              badge="AI Powered"
+              delay={5}
+            />
+
+            {/* AI Interview */}
+            <FeatureCard
+              to="/select-role-interview"
+              icon={Bot}
+              iconColor="#38bdf8"
+              iconBg="rgba(14,165,233,0.1)"
+              borderColor="#0ea5e9"
+              title="AI Interview"
+              desc="Simulate a real interview with an AI interviewer. Answer questions by voice, get instant feedback, and sharpen your communication skills."
+              cta="Start AI Interview"
+              ctaColor="#38bdf8"
               badge="AI Powered"
               delay={5}
             />
