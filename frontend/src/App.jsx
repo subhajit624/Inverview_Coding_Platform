@@ -11,9 +11,24 @@ import InterviewDashboard from './pages/InterviewDashboard';
 import Interview from './pages/Interview';
 import ResumeUpload from './pages/ResumeUpload';
 import ResumeHistory from './pages/ResumeHistory';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 
 function App() {
+
+useEffect(() => {     // Wake up the AI backend on app load 
+  const wakeUpAIBackend = async () => {
+    try {
+      const res = await axios.get(import.meta.env.VITE_AI_BACKEND_URL);
+      console.log(res.data.status);
+    } catch (err) {
+      console.error('Failed to wake backend:', err);
+    }
+  };
+
+  wakeUpAIBackend();
+}, []);
 
   const { isSignedIn, isLoaded } = useUser()
 
