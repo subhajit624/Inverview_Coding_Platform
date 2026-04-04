@@ -13,6 +13,9 @@ import ResumeUpload from './pages/ResumeUpload';
 import ResumeHistory from './pages/ResumeHistory';
 import { useEffect } from 'react';
 import axios from 'axios';
+import SelectRoleInterview from './pages/SelectRoleInterview';
+import InterViewHistory from './pages/InterViewHistory';
+import Ai_InterView from './pages/Ai_InterView';
 
 
 function App() {
@@ -46,6 +49,9 @@ useEffect(() => {     // Wake up the AI backend on app load
         <Route path="/interview/:id" element={isSignedIn ? <Interview /> : <Navigate to="/" />} />
         <Route path="/resume-upload" element={isSignedIn ? <ResumeUpload /> : <Navigate to="/" />} />
         <Route path="/resume-history" element={isSignedIn ? <ResumeHistory /> : <Navigate to="/" />} />
+        <Route path="/select-role-interview" element={isSignedIn ? <SelectRoleInterview /> : <Navigate to="/" />} />
+        <Route path="/interview-history" element={isSignedIn ? <InterViewHistory /> : <Navigate to="/" />} />
+        <Route path="/ai-interview" element={isSignedIn ? <Ai_InterView /> : <Navigate to="/" />} />
       </Routes>
 
       <Toaster position='top-right' toastOptions={{ duration: 1500 }} />
