@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserButton } from "@clerk/react";
 import {
@@ -9,6 +9,7 @@ import {
 import problems from "../data/problems";
 import axiosInstance from "../lib/axios";
 import toast from "react-hot-toast";
+import { getSocket } from "../lib/socket";
 
 const DIFF_CONFIG = {
   Easy:   { color: "#34d399", bg: "rgba(52,211,153,0.08)",  border: "rgba(52,211,153,0.25)" },
@@ -257,7 +258,7 @@ export default function InterviewDashboard() {
     p.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const fetchSessions = async (showSpinner = false) => {
+  const fetchSessions = useCallback(async (showSpinner = false) => {
     if (showSpinner) setRefreshing(true);
     else setLoadingActive(true);
     try {
@@ -273,9 +274,23 @@ export default function InterviewDashboard() {
       setLoadingActive(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchSessions(); }, []);
+  useEffect(() => { fetchSessions(); }, [fetchSessions]);
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    const handleSessionsChanged = () => {
+      fetchSessions();
+    };
+
+    socket.on("sessions:changed", handleSessionsChanged);
+
+    return () => {
+      socket.off("sessions:changed", handleSessionsChanged);
+    };
+  }, [fetchSessions]);
 
   const handleCreate = async () => {
     setCreating(true);

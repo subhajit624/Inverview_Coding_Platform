@@ -1,4 +1,11 @@
 import { Session } from "../models/Session.js";
+import { clearLiveSessionState, emitSessionUpdated, emitSessionsChanged } from "../lib/socket.js";
+
+async function getPopulatedSession(sessionId) {
+    return Session.findById(sessionId)
+        .populate("host", "name profileImage email clerkId")
+        .populate("participant", "name profileImage email clerkId");
+}
 
 export async function createSession(req, res) {
     try {
@@ -19,7 +26,10 @@ export async function createSession(req, res) {
         callId,
        });
 
-       res.status(201).json({ session });
+       const populatedSession = await getPopulatedSession(session._id);
+       emitSessionsChanged(session._id);
+
+       res.status(201).json({ session: populatedSession || session });
     } catch (error) {
         console.error("Error creating session:", error);
         res.status(500).json({ error: "Failed to create session" });
@@ -72,7 +82,6 @@ export async function joinSession(req, res) {
     try {
         const {id} = req.params;
         const userId = req.user._id;
-        const clerkId = req.user.clerkId;
 
         const session = await Session.findById(id);
         if(!session){
@@ -94,7 +103,11 @@ export async function joinSession(req, res) {
         session.participant = userId;
         await session.save();
 
-        res.status(200).json({ session });
+        const populatedSession = await getPopulatedSession(session._id);
+        emitSessionUpdated(populatedSession || session);
+        emitSessionsChanged(session._id);
+
+        res.status(200).json({ session: populatedSession || session });
     } catch (error) {
         console.log("Error joining session:", error);
         res.status(500).json({ error: "Failed to join session" });
@@ -123,7 +136,12 @@ export async function endSession(req, res) {
         session.status = "completed";
         await session.save();
 
-        res.status(200).json({ session });
+        const populatedSession = await getPopulatedSession(session._id);
+        clearLiveSessionState(session._id);
+        emitSessionUpdated(populatedSession || session);
+        emitSessionsChanged(session._id);
+
+        res.status(200).json({ session: populatedSession || session });
     } catch (error) {
         console.log("Error ending session:", error);
         res.status(500).json({ error: "Failed to end session" });

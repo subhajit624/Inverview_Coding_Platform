@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import problems from "../data/problems";
 import { runOnPiston } from "../hooks/usePiston";
 import axiosInstance from "../lib/axios";
+import { getSocket } from "../lib/socket";
 
 const DIFF_CONFIG = {
   Easy:   { color: "#34d399", bg: "rgba(52,211,153,0.08)",  border: "rgba(52,211,153,0.25)" },
@@ -46,11 +47,23 @@ export default function Interview() {
   const [mobileTab, setMobileTab] = useState("problem");
   const [isMobile,  setIsMobile]  = useState(false);
 
+  const socketRef = useRef(null);
+  const localCodeEmitTimer = useRef(null);
+  const remoteCodeApplyingRef = useRef(false);
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (localCodeEmitTimer.current) {
+        clearTimeout(localCodeEmitTimer.current);
+      }
+    };
   }, []);
 
   // ── Horizontal splitter ───────────────────────────────────────────────────
@@ -141,7 +154,9 @@ export default function Interview() {
 
         const prob = problems.find(p => p.title === sess.problem);
         setProblem(prob || null);
-        if (prob) setCode(prob.starterCode["python"] || "");
+        if (prob) {
+          setCode((prevCode) => prevCode || prob.starterCode["python"] || "");
+        }
 
         const isHost        = sess.host?.clerkId === user.id;
         const isParticipant = sess.participant?.clerkId === user.id;
@@ -163,11 +178,154 @@ export default function Interview() {
     init();
   }, [id, user]);
 
+  const applyRemoteCode = useCallback((nextCode) => {
+    remoteCodeApplyingRef.current = true;
+    setCode(nextCode);
+
+    setTimeout(() => {
+      remoteCodeApplyingRef.current = false;
+    }, 0);
+  }, []);
+
+  const emitCodeSync = useCallback((nextCode, nextLanguage) => {
+    if (!socketRef.current) return;
+
+    socketRef.current.emit("editor:sync", {
+      sessionId: String(id),
+      code: nextCode,
+      language: nextLanguage,
+      updatedBy: user?.id || null,
+    });
+  }, [id, user]);
+
+  const handleCodeChange = useCallback((val) => {
+    const nextCode = val ?? "";
+    setCode(nextCode);
+
+    if (remoteCodeApplyingRef.current) return;
+
+    if (localCodeEmitTimer.current) {
+      clearTimeout(localCodeEmitTimer.current);
+    }
+
+    localCodeEmitTimer.current = setTimeout(() => {
+      emitCodeSync(nextCode, language);
+    }, 120);
+  }, [emitCodeSync, language]);
+
+  useEffect(() => {
+    if (!id || !user) return;
+
+    const socket = getSocket();
+    socketRef.current = socket;
+
+    const currentUser = {
+      clerkId: user.id,
+      name: user.fullName || user.username || user.firstName || "User",
+    };
+
+    const handleSessionUpdated = ({ session: updatedSession } = {}) => {
+      if (!updatedSession || String(updatedSession._id) !== String(id)) return;
+      setSession(updatedSession);
+    };
+
+    const handleUserJoined = ({ sessionId, user: joinedUser } = {}) => {
+      if (String(sessionId || "") !== String(id)) return;
+      if (joinedUser?.clerkId === user.id) return;
+
+      toast.success(`${joinedUser?.name || "Partner"} joined the session`, {
+        style: { background: "rgba(12,12,22,0.95)", color: "#34d399", border: "1px solid rgba(52,211,153,0.3)", borderRadius: "12px" },
+      });
+    };
+
+    const handleUserLeft = ({ sessionId, user: leftUser } = {}) => {
+      if (String(sessionId || "") !== String(id)) return;
+      if (leftUser?.clerkId === user.id) return;
+
+      toast(`${leftUser?.name || "Partner"} left the session`, {
+        style: { background: "rgba(12,12,22,0.95)", color: "#fff", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px" },
+      });
+    };
+
+    const handleLiveState = (state = {}) => {
+      if (String(state.sessionId || "") !== String(id)) return;
+
+      if (typeof state.language === "string") {
+        setLanguage(state.language);
+      }
+
+      if (typeof state.code === "string") {
+        applyRemoteCode(state.code);
+      }
+
+      if (Array.isArray(state.results)) {
+        setResults(state.results);
+      }
+    };
+
+    const handleEditorSync = (payload = {}) => {
+      if (String(payload.sessionId || "") !== String(id)) return;
+      if (payload.updatedBy === user.id) return;
+
+      if (typeof payload.language === "string") {
+        setLanguage(payload.language);
+      }
+
+      if (typeof payload.code === "string") {
+        applyRemoteCode(payload.code);
+      }
+
+      setResults([]);
+    };
+
+    const handleExecutionSync = (payload = {}) => {
+      if (String(payload.sessionId || "") !== String(id)) return;
+      if (Array.isArray(payload.results)) {
+        setResults(payload.results);
+      }
+
+      const isOwnRun = payload.lastRunBy?.clerkId === user.id;
+      if (!isOwnRun && payload.lastRunBy?.name) {
+        toast(`${payload.lastRunBy.name} ran test cases`, {
+          style: { background: "rgba(12,12,22,0.95)", color: "#fff", border: "1px solid rgba(99,102,241,0.35)", borderRadius: "12px" },
+        });
+      }
+    };
+
+    socket.emit("session:join-room", {
+      sessionId: String(id),
+      user: currentUser,
+    });
+
+    socket.on("session:updated", handleSessionUpdated);
+    socket.on("session:user-joined", handleUserJoined);
+    socket.on("session:user-left", handleUserLeft);
+    socket.on("session:live-state", handleLiveState);
+    socket.on("editor:sync", handleEditorSync);
+    socket.on("execution:sync", handleExecutionSync);
+
+    return () => {
+      socket.emit("session:leave-room", { sessionId: String(id) });
+      socket.off("session:updated", handleSessionUpdated);
+      socket.off("session:user-joined", handleUserJoined);
+      socket.off("session:user-left", handleUserLeft);
+      socket.off("session:live-state", handleLiveState);
+      socket.off("editor:sync", handleEditorSync);
+      socket.off("execution:sync", handleExecutionSync);
+
+      if (socketRef.current === socket) {
+        socketRef.current = null;
+      }
+    };
+  }, [id, user, applyRemoteCode]);
+
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleLangChange = lang => {
+    const nextCode = problem ? (problem.starterCode[lang] || "") : "";
     setLanguage(lang);
-    if (problem) setCode(problem.starterCode[lang] || "");
+    setCode(nextCode);
     setResults([]);
+    emitCodeSync(nextCode, lang);
   };
 
   const handleRun = async () => {
@@ -184,6 +342,16 @@ export default function Interview() {
       const res       = await runOnPiston(code, language, problem.testCases);
       const allPassed = res.every(r => r.passed);
       setResults(res);
+
+      socketRef.current?.emit("execution:sync", {
+        sessionId: String(id),
+        results: res,
+        allPassed,
+        lastRunBy: {
+          clerkId: user?.id || "",
+          name: user?.fullName || user?.username || user?.firstName || "Partner",
+        },
+      });
 
       if (allPassed) {
         toast.success(`All ${res.length} test cases passed!`, {
@@ -357,7 +525,7 @@ export default function Interview() {
           height="100%"
           language={language}
           value={code}
-          onChange={val => setCode(val)}
+          onChange={handleCodeChange}
           theme="vs-dark"
           options={{
             fontSize: isMobile ? 12 : 14,
