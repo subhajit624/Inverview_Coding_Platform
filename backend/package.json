@@ -22,6 +22,7 @@
     "inngest": "^3.44.3",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
+    "socket.io": "^4.8.3",
     "stream-chat": "^9.24.0",
     "video_calling": "file:.."
   }
