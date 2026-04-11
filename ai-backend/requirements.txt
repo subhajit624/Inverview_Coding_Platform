@@ -2,10 +2,14 @@ fastapi
 uvicorn
 python-multipart
 langchain
+langchain-text-splitters
+langchain-mongodb
 langchain-groq
 langchain-google-genai
 langgraph
 cloudinary
 pymupdf
+pdfplumber
+pymongo
 python-dotenv
 pydantic

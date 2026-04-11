@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Code2, ArrowRight, BookOpen, Video, Zap, Trophy, Users, FileSearch, Bot } from "lucide-react";
+import { Code2, ArrowRight, BookOpen, Video, Zap, Trophy, Users, FileSearch, Bot, NotebookPen } from "lucide-react";
 import { UserButton, useUser } from "@clerk/react";
 import { useEffect, useState } from "react";
 import axiosInstance from "../lib/axios";
@@ -342,6 +342,21 @@ const Dashboard = () => {
               cta="Start AI Interview"
               ctaColor="#38bdf8"
               badge="AI Powered"
+              delay={5}
+            />
+
+            {/* Ask Your Notes */}
+            <FeatureCard
+              to="/notes-upload"
+              icon={NotebookPen}
+              iconColor="#fb923c"
+              iconBg="rgba(249,115,22,0.1)"
+              borderColor="#f97316"
+              title="Ask Your Notes"
+              desc="Upload any PDF — DSA sheets, CS core notes, or study material — and chat with it instantly using AI. Get answers directly from your own notes."
+              cta="Upload & Ask"
+              ctaColor="#fb923c"
+              badge="RAG Powered"
               delay={5}
             />
 
