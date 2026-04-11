@@ -16,6 +16,9 @@ import axios from 'axios';
 import SelectRoleInterview from './pages/SelectRoleInterview';
 import InterViewHistory from './pages/InterViewHistory';
 import Ai_InterView from './pages/Ai_InterView';
+import NotesUpload from './pages/NotesUpload';
+import Talk_Notes from './pages/Talk_Notes';
+import Notes_History from './pages/Notes_History';
 
 
 function App() {
@@ -52,6 +55,9 @@ useEffect(() => {     // Wake up the AI backend on app load
         <Route path="/select-role-interview" element={isSignedIn ? <SelectRoleInterview /> : <Navigate to="/" />} />
         <Route path="/interview-history" element={isSignedIn ? <InterViewHistory /> : <Navigate to="/" />} />
         <Route path="/ai-interview" element={isSignedIn ? <Ai_InterView /> : <Navigate to="/" />} />
+        <Route path="/notes-upload" element={isSignedIn ? <NotesUpload /> : <Navigate to="/" />} />
+        <Route path="/talk-notes/:id" element={isSignedIn ? <Talk_Notes /> : <Navigate to="/" />} />
+        <Route path="/notes-history" element={isSignedIn ? <Notes_History /> : <Navigate to="/" />} /> 
       </Routes>
 
       <Toaster position='top-right' toastOptions={{ duration: 1500 }} />

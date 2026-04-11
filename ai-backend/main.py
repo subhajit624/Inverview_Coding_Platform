@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routers.resume import router as resume_router
 from routers.interview import router as interview_router
+from routers.notes import router as notes_router
 
 
 app = FastAPI(title="CrackIt AI Backend")
@@ -22,6 +23,7 @@ app.add_middleware(
 
 app.include_router(resume_router, prefix="/api/resume", tags=["resume"])
 app.include_router(interview_router, prefix="/interview", tags=["interview"])
+app.include_router(notes_router, tags=["notes"])
 
 
 @app.get("/")
